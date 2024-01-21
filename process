@@ -1,0 +1,88 @@
+Rubyをインストール
+1.rmv get stable
+2.rmv install 3.1.2 ←可変
+3.rvm --default use 3.1.2
+上記を行わないとRuby2.6.3になる（Cloud9初期）
+
+Rails
+1.rails new アプリ名 （Railsの作成
+2.ralis g model Event
+3.migrateファイルを編集
+　タイトル、開始と終わり
+4.rails db:migrate
+5.rails g controller 名前 アクション
+
+#### bootstrap ####
+Gemfile
+1.Gemfileに下記２点記述
+  gem 'bootstrap'
+  gem 'jquery-rails'
+2.bundle install
+
+CSSの編集
+3.app\assets\stylesheets\application.scssに下記記述 (scssに変更して中身消す
+  @import "bootstrap";
+4.config\importmap.rbに下記記述
+  pin "bootstrap", to: "bootstrap.min.js", preload: true
+  pin "@popperjs/core", to: "popper.js", preload: true
+5.config\initializers\assets.rbに下記記述
+  Rails.application.config.assets.precompile += %w(bootstrap.min.js popper.js)
+6.app\javascript\application.jsに下記記述
+  //= require jquery3
+  //= require popper
+  //= require bootstrap
+#### bootstrap ####
+
+full_calendar
+1.Gemfile
+  gem 'jquery-rails'
+  gem 'fullcalendar-rails'
+  gem 'momentjs-rails'
+  
+2.calendar.jsonに以下
+----------------
+  import { Calendar } from '@fullcalendar/core';
+  import interactionPlugin from '@fullcalendar/interaction';
+  import dayGridPlugin from '@fullcalendar/daygrid';
+  import timeGridPlugin from '@fullcalendar/timegrid';
+  
+  document.addEventListener('turbolinks:load', function() {
+    var calendarEl = document.getElementById('calendar');
+  
+    var calendar = new Calendar(calendarEl, {
+      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+      locale: 'ja',
+      // timeZone: 'Asia/Tokyo',
+      //ボタンの位置、種類とかの設定
+      headerToolbar: {
+        start: 'prev,next,today',
+        center: 'title',
+        end: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      buttonText: {
+        today: '今日'
+      },
+      // allDayText: '終日',
+      //表示させる場所、本記事ではeventsのindexにあたるルーティング
+      events:'/calendar',
+  
+      //色の表示について
+      // eventColor: function(arg) {
+      //   var eventColor = arg.event.color;
+      //   return eventColor;
+      // },
+    });
+      //カレンダー表示
+    calendar.render();
+  });
+----------------
+3.json.jbuilderの作成
+ ex)json.array!(@events) do |evnet|
+    end
+4.routesに
+  # defaults :json追加でjsonでの受け取り
+  get '/calendar' => "events#index", defaults: { format: :json }
+  
+※ yarn add @full_calendar/coreなど
+ やらないとカレンダーが表示されないため注意
+※json
